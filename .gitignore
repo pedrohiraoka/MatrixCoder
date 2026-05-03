@@ -1,0 +1,18 @@
+```
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database
+nexus_matrix/data/nexus_matrix.db
+
+# Logs
+server.log
+
+# Environment
+.env
+.env.local
+*.env.*
+```
