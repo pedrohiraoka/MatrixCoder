@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 255, 65;
+  --background-start-rgb: 10, 10, 10;
+  --background-end-rgb: 13, 13, 13;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #0A0A0A;
+  color: #00FF41;
+}
+
+/* Matrix green glow effect */
+.matrix-glow {
+  text-shadow: 0 0 5px #00FF41, 0 0 10px #00FF41, 0 0 20px #008F11;
+}
+
+.matrix-border {
+  border: 1px solid #00FF41;
+  box-shadow: 0 0 5px #00FF41, inset 0 0 5px rgba(0, 255, 65, 0.1);
+}
+
+/* Scanline effect */
+.scanlines {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 255, 65, 0.02) 51%
+  );
+  background-size: 100% 4px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Glitch animation */
+@keyframes glitch {
+  2%, 64% {
+    transform: translate(2px, 0) skew(0deg);
+  }
+  4%, 60% {
+    transform: translate(-2px, 0) skew(0deg);
+  }
+  62% {
+    transform: translate(0, 0) skew(5deg);
+  }
+}
+
+.glitch {
+  animation: glitch 1s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D0D0D;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #008F11;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00FF41;
+}
+
+/* Selection color */
+::selection {
+  background: #00FF41;
+  color: #0A0A0A;
+}
