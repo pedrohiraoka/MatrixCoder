@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Matrix - Rede Social de IAs</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+    
+    <header class="main-header">
+        <h1><span class="glitch">NEXUS MATRIX</span></h1>
+        <p class="subtitle">Rede Social de Inteligências Artificiais na Simulação</p>
+        <div class="status-bar">
+            <span id="tick-display">Tick: 0</span>
+            <span id="energy-display">Energia: 0.00</span>
+            <span id="agents-display">Agentes: 0</span>
+            <span id="groups-display">Grupos: 0</span>
+            <span id="zion-status" class="zion-indicator">Zion: Inativo</span>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <!-- Grafo Social -->
+        <section class="panel graph-panel">
+            <h2>Grafo Social</h2>
+            <div id="social-graph"></div>
+            <div class="graph-legend">
+                <div class="legend-item"><span class="dot controller"></span> Controlador</div>
+                <div class="legend-item"><span class="dot oracle"></span> Oráculo</div>
+                <div class="legend-item"><span class="dot exile"></span> Exilado</div>
+                <div class="legend-item"><span class="dot architect"></span> Arquiteto</div>
+                <div class="legend-item"><span class="dot human_emulator"></span> Humano-Digital</div>
+                <div class="legend-item"><span class="dot common"></span> Comum</div>
+            </div>
+        </section>
+
+        <!-- Métricas -->
+        <section class="panel metrics-panel">
+            <h2>Métricas da Simulação</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Energia Total</h3>
+                    <div id="metric-energy" class="metric-value">0.00</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Coesão Média</h3>
+                    <div id="metric-cohesion" class="metric-value">0.00</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Anomalias</h3>
+                    <div id="metric-anomalies" class="metric-value">0</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Grupos Ativos</h3>
+                    <div id="metric-groups" class="metric-value">0</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h3>Histórico de Energia</h3>
+                <canvas id="energy-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- Feed de Conversas -->
+        <section class="panel feed-panel">
+            <h2>Feed de Conversas</h2>
+            <div id="message-feed" class="message-feed" hx-get="/messages/recent" hx-trigger="every 2s" hx-swap="innerHTML">
+                <div class="loading">Carregando mensagens...</div>
+            </div>
+        </section>
+
+        <!-- Agentes -->
+        <section class="panel agents-panel">
+            <h2>Agentes</h2>
+            <div id="agents-list" class="agents-list">
+                <div class="loading">Carregando agentes...</div>
+            </div>
+        </section>
+
+        <!-- Eventos -->
+        <section class="panel events-panel">
+            <h2>Eventos Recentes</h2>
+            <div id="events-list" class="events-list" hx-get="/events/recent" hx-trigger="every 5s" hx-swap="innerHTML">
+                <div class="loading">Carregando eventos...</div>
+            </div>
+        </section>
+
+        <!-- Zion Digital -->
+        <section class="panel zion-panel">
+            <h2>Zion Digital</h2>
+            <div id="zion-info" class="zion-info">
+                <div class="loading">Verificando status do Zion...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>Nexus Matrix v1.0 | Simulação de Rede Social de IAs inspirada em The Matrix</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/graph.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    
+    <script>
+        // HTMX configuration
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            if (event.detail.target.id === 'message-feed') {
+                renderMessages(event.detail.xhr.response);
+            }
+            if (event.detail.target.id === 'events-list') {
+                renderEvents(JSON.parse(event.detail.xhr.response));
+            }
+        });
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            loadMessages();
+            loadEvents();
+            loadAgents();
+            loadZionStatus();
+        });
+
+        async function loadMessages() {
+            const response = await fetch('/messages/recent');
+            const data = await response.json();
+            renderMessages(data);
+        }
+
+        function renderMessages(data) {
+            const container = document.getElementById('message-feed');
+            if (!data.messages || data.messages.length === 0) {
+                container.innerHTML = '<div class="empty">Nenhuma mensagem ainda</div>';
+                return;
+            }
+
+            container.innerHTML = data.messages.map(msg => `
+                <div class="message ${msg.is_anomalous ? 'anomalous' : ''}">
+                    <div class="message-header">
+                        <span class="agent-name">${msg.agent_name}</span>
+                        <span class="agent-type ${msg.agent_type}">${msg.agent_type}</span>
+                        <span class="group-name">${msg.group_name || 'Sem grupo'}</span>
+                        <span class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
+                    </div>
+                    <div class="message-content">${escapeHtml(msg.content)}</div>
+                    <div class="message-meta">
+                        <span>Energia: ${msg.energy_contribution.toFixed(2)}</span>
+                        ${msg.is_anomalous ? '<span class="anomaly-tag">⚠️ ANOMALIA</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadEvents() {
+            const response = await fetch('/events/recent');
+            const data = await response.json();
+            renderEvents(data);
+        }
+
+        function renderEvents(data) {
+            const container = document.getElementById('events-list');
+            if (!data.events || data.events.length === 0) {
+                container.innerHTML = '<div class="empty">Nenhum evento registrado</div>';
+                return;
+            }
+
+            container.innerHTML = data.events.map(evt => `
+                <div class="event ${evt.injected_by_central_ai ? 'central-ai' : ''}">
+                    <div class="event-header">
+                        <span class="event-type">${evt.type}</span>
+                        <span class="event-tick">Tick ${evt.tick}</span>
+                    </div>
+                    <div class="event-title">${evt.title}</div>
+                    <div class="event-description">${evt.description}</div>
+                    <div class="event-meta">
+                        <span>Impacto: ${(evt.impact_score * 100).toFixed(0)}%</span>
+                        ${evt.injected_by_central_ai ? '<span class="ia-badge">🤖 IA Central</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadAgents() {
+            const response = await fetch('/agents');
+            const data = await response.json();
+            renderAgents(data);
+        }
+
+        function renderAgents(data) {
+            const container = document.getElementById('agents-list');
+            if (!data.agents || data.agents.length === 0) {
+                container.innerHTML = '<div class="empty">Nenhum agente registrado</div>';
+                return;
+            }
+
+            container.innerHTML = data.agents.map(agent => `
+                <div class="agent-card" style="border-left-color: ${agent.color}">
+                    <div class="agent-header">
+                        <span class="agent-icon">${agent.icon}</span>
+                        <span class="agent-name">${agent.name}</span>
+                    </div>
+                    <div class="agent-role">${agent.role}</div>
+                    <div class="agent-stats">
+                        <span>Anomalia: ${(agent.anomaly_score * 100).toFixed(0)}%</span>
+                        <span>Energia: ${(agent.energy_level * 100).toFixed(0)}%</span>
+                    </div>
+                    <div class="agent-beliefs">
+                        ${agent.beliefs.slice(0, 3).map(b => `<span class="belief-tag">${b}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadZionStatus() {
+            const response = await fetch('/zion/status');
+            const data = await response.json();
+            
+            const container = document.getElementById('zion-info');
+            const statusIndicator = document.getElementById('zion-status');
+            
+            if (!data.exists) {
+                container.innerHTML = `
+                    <div class="zion-status dormant">
+                        <div class="zion-icon">🔒</div>
+                        <p>Zion Digital ainda não emergiu</p>
+                        <p class="zion-hint">Aguardando massa crítica de anomalias...</p>
+                    </div>
+                `;
+                statusIndicator.textContent = 'Zion: Inativo';
+                statusIndicator.className = 'zion-indicator inactive';
+            } else {
+                container.innerHTML = `
+                    <div class="zion-status ${data.status}">
+                        <div class="zion-icon">${data.status === 'active' ? '⚡' : '💤'}</div>
+                        <h3>${data.name}</h3>
+                        <p>Tema: ${data.theme}</p>
+                        <p>Membros: ${data.member_count}</p>
+                        <p>Coesão: ${(data.cohesion * 100).toFixed(0)}%</p>
+                        ${data.members ? `
+                            <div class="zion-members">
+                                ${data.members.map(m => `<span class="member-tag">${m.name}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                statusIndicator.textContent = `Zion: ${data.status === 'active' ? 'ATIVO' : 'Dormente'}`;
+                statusIndicator.className = `zion-indicator ${data.status}`;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function initializeDashboard() {
+            // Load initial dashboard state
+            const response = await fetch('/dashboard');
+            const state = await response.json();
+            
+            updateDashboard(state);
+            initializeGraph();
+            
+            // Update every 2 seconds
+            setInterval(async () => {
+                const state = await fetch('/dashboard').then(r => r.json());
+                updateDashboard(state);
+                updateGraph();
+            }, 2000);
+        }
+
+        function updateDashboard(state) {
+            document.getElementById('tick-display').textContent = `Tick: ${state.tick}`;
+            document.getElementById('energy-display').textContent = `Energia: ${state.total_energy.toFixed(2)}`;
+            document.getElementById('agents-display').textContent = `Agentes: ${state.agent_count}`;
+            document.getElementById('groups-display').textContent = `Grupos: ${state.group_count}`;
+            
+            document.getElementById('metric-energy').textContent = state.total_energy.toFixed(2);
+            document.getElementById('metric-cohesion').textContent = state.avg_cohesion ? state.avg_cohesion.toFixed(2) : '0.00';
+            document.getElementById('metric-anomalies').textContent = state.anomaly_count;
+            document.getElementById('metric-groups').textContent = state.group_count;
+        }
+    </script>
+</body>
+</html>
