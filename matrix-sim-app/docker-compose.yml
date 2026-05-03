@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: matrix-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=Matrix Simulation API
+      - DEBUG=true
+      - DATABASE_URL=sqlite+aiosqlite:///./matrix.db
+      - CRYPTO_KEY=${CRYPTO_KEY:-your-secret-key-change-in-production-32chars!}
+    volumes:
+      - ./backend/app:/app/app
+      - backend-data:/app/data
+    restart: unless-stopped
+    networks:
+      - matrix-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: matrix-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - matrix-network
+
+volumes:
+  backend-data:
+
+networks:
+  matrix-network:
+    driver: bridge
