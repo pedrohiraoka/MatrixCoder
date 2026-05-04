@@ -1,0 +1,56 @@
+```
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.local
+.env.*
+
+# Python
+venv/
+.venv/
+pip-log.txt
+pip-selfcheck.json
+*.so
+.Python
+*.egg-info/
+.eggs/
+
+# Build artifacts
+dist/
+build/
+*.egg
+*.pyc
+*.pyo
+*~
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Frontend
+.next/
+.nuxt/
+.vuepress/dist/
+public/dist/
+out/
+coverage/
+nyc_output/
+```
