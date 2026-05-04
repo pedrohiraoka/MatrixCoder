@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 240, 230, 210;
+  --background-start-rgb: 26, 26, 46;
+  --background-end-rgb: 22, 33, 62;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  font-family: Georgia, serif;
+}
+
+/* Medieval theme utilities */
+.medieval-border {
+  border: 2px solid #d4af37;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.medieval-button {
+  @apply px-4 py-2 bg-medieval-dark border-2 border-medieval-gold text-medieval-gold 
+         hover:bg-medieval-accent hover:text-white transition-all duration-200 
+         font-bold uppercase tracking-wider;
+}
+
+.medieval-panel {
+  @apply bg-medieval-dark border-2 border-medieval-gold p-4 rounded-lg 
+         shadow-lg shadow-medieval-gold/20;
+}
+
+/* Grid cell styles */
+.cell {
+  @apply w-8 h-8 sm:w-10 sm:h-10 border border-gray-700 flex items-center 
+         justify-center cursor-pointer transition-all duration-150 
+         hover:scale-110 hover:z-10 relative;
+}
+
+.cell-plains { @apply bg-green-900/50; }
+.cell-forest { @apply bg-emerald-900/60; }
+.cell-mountain { @apply bg-stone-700/70; }
+.cell-water { @apply bg-blue-800/60; }
+.cell-castle { @apply bg-purple-900/70; }
+.cell-resource { @apply bg-amber-800/60; }
+.cell-danger { @apply bg-red-900/60 animate-pulse; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4af37;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e94560;
+}
