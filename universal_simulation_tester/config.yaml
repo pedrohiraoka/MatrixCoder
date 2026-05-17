@@ -1,0 +1,131 @@
+# Configuração do Universal Simulation Hypothesis Tester
+
+# Parâmetros de Simulação
+simulation:
+  # Número de partículas para testes quânticos
+  num_particles: 1000
+  
+  # Faixa de energia para análise de raios cósmicos (em eV)
+  energy_range:
+    min: 1e9
+    max: 1e20
+    
+  # Resolução para análise de discretização do espaço-tempo
+  spacetime_resolution: 1e-35  # metros (escala de Planck)
+  
+  # Bases numéricas para testes de padrões
+  numeric_bases:
+    - 2   # binária
+    - 10  # decimal
+    - 16  # hexadecimal
+    - 60  # sexagesimal (Babilônia)
+    
+# Parâmetros Estatísticos
+statistics:
+  # Nível de significância (alpha)
+  significance_level: 0.05
+  
+  # Correção para múltiplas comparações
+  multiple_comparison_correction: "bonferroni"  # ou "fdr"
+  
+  # Número de iterações para Monte Carlo
+  monte_carlo_iterations: 10000
+  
+  # Intervalo de confiança
+  confidence_level: 0.95
+
+# Parâmetros de Visualização
+visualization:
+  # Tema dos gráficos
+  theme: "dark"  # ou "light"
+  
+  # Paleta de cores
+  color_palette:
+    primary: "#00ff88"
+    secondary: "#00ccff"
+    warning: "#ffaa00"
+    danger: "#ff4444"
+    success: "#00ff88"
+    
+  # Tamanho padrão das figuras
+  figure_width: 1200
+  figure_height: 700
+  
+  # DPI para exportação
+  export_dpi: 300
+
+# Parâmetros de Processamento
+processing:
+  # Tempo máximo de processamento por teste (segundos)
+  max_processing_time: 300
+  
+  # Habilitar processamento paralelo
+  parallel_processing: true
+  
+  # Número de workers para processamento paralelo
+  num_workers: 4
+  
+  # Cache de resultados intermediários
+  enable_cache: true
+  cache_directory: "./cache"
+
+# APIs Externas (opcionais)
+apis:
+  # Dados do telescópio Planck
+  planck_api:
+    enabled: false
+    url: "https://pla.esac.esa.int/pla/aio/product-action"
+    
+  # Sloan Digital Sky Survey
+  sdss_api:
+    enabled: false
+    url: "https://skyserver.sdss.org/dr16/en/tools/search/x_sql.aspx"
+    
+  # CERN Open Data (LHC)
+  cern_api:
+    enabled: false
+    url: "http://opendata.cern.ch/"
+    
+  # Observatório Pierre Auger
+  auger_api:
+    enabled: false
+    url: "https://www.auger.org/"
+
+# Idioma e Internacionalização
+i18n:
+  # Idioma padrão
+  default_language: "pt-BR"
+  
+  # Idiomas disponíveis
+  available_languages:
+    - "pt-BR"
+    - "en-US"
+
+# Exportação
+export:
+  # Diretório padrão para exportações
+  default_directory: "./exports"
+  
+  # Formatos disponíveis
+  formats:
+    - "pdf"
+    - "json"
+    - "csv"
+    - "latex"
+    
+  # Incluir metadados nos arquivos exportados
+  include_metadata: true
+
+# Logging
+logging:
+  # Nível de log
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  
+  # Arquivo de log
+  file: "./logs/app.log"
+  
+  # Formato do log
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Habilitar log em arquivo
+  enable_file_logging: true
